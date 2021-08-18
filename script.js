@@ -99,25 +99,27 @@ function drawGrid() {
 
 function cellClicked(cell) {
     if (game_state == 0) {
-        console.log(game_state);
-        id("btn" + cell).style.visibility = "hidden";
-        shownCount++;
-        if (minesArray[cell] == "%") {
-            alert("UR BADDDDDDDDD HAHAHAHA :)");
-            game_state == 1;
-            for (let i = 0; i < minesArray.length; i++) {
-                //if (btnState[i].state != 1) 
-                id("btn" + i).style.visibility = "hidden";
+        if (btnState[cell].state == 0) {
+            id("btn" + cell).style.visibility = "hidden";
+            shownCount++;
+            if (minesArray[cell] == "%") {
+                alert("UR BADDDDDDDDD HAHAHAHA :)");
+                game_state == 1;
+                for (let i = 0; i < minesArray.length; i++) {
+                    //if (btnState[i].state != 1) 
+                    id("btn" + i).style.visibility = "hidden";
+                }
+                id("mineimg" + cell).setAttribute("src", "mine_red.png")
             }
-            id("mineimg" + cell).setAttribute("src", "mine_red.png")
-        }
-        else if (minesArray[cell] == ""){
-            console.log(minesArray[cell]);
-            blankShown = [];
-            recursiveShowNearby(cell);
-        }
-        if (size - mines == shownCount) {
-            //alert("YOU WIN!!!!!!!!!!!");
+            else if (minesArray[cell] == ""){
+                console.log(minesArray[cell]);
+                blankShown = [];
+                recursiveShowNearby(cell);
+            }
+            if (size - mines == shownCount) {
+                alert("YOU WIN!!!!!!!!!!!");
+                game_state = 1;
+            }
         }
     }
 }
@@ -144,6 +146,8 @@ function checkSurround(cell) {
 }
 
 function recursiveShowNearby(cell) {
+    console.log(id("btn" + cell).style.visibility);
+    if (id("btn" + cell).style.visibility != "hidden") shownCount++;
     id("btn" + cell).style.visibility = "hidden";
 
     blankShown.push(cell);
@@ -151,13 +155,12 @@ function recursiveShowNearby(cell) {
     let c = getXY(cell);
 
     let surrounding = checkBoundaries(c);
-    console.log(cell); 
     for (let i = 0; i < surrounding.length; i++) {   
         
         let x = surrounding[i][0] + c[0];
         let y = surrounding[i][1] + c[1];  
         let checkCell = getCell(x, y);
-        console.log(checkCell, x ,y); 
+        if (id("btn" + checkCell).style.visibility != "hidden") shownCount++;
         id("btn" + checkCell).style.visibility = "hidden"; 
         
         if (minesArray[checkCell] == "" && !blankShown.includes(checkCell)) {
