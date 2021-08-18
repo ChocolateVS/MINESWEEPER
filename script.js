@@ -117,7 +117,7 @@ function cellClicked(cell) {
             recursiveShowNearby(cell);
         }
         if (size - mines == shownCount) {
-            alert("YOU WIN!!!!!!!!!!!");
+            //alert("YOU WIN!!!!!!!!!!!");
         }
     }
 }
