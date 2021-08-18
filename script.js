@@ -145,22 +145,23 @@ function checkSurround(cell) {
 
 function recursiveShowNearby(cell) {
     id("btn" + cell).style.visibility = "hidden";
-    shownCount++;
-    let c = getXY(cell);
-    let surrounding = checkBoundaries(c);
 
     blankShown.push(cell);
 
-    for (let i = 0; i < surrounding.length; i++) { 
-          
+    let c = getXY(cell);
+
+    let surrounding = checkBoundaries(c);
+    console.log(cell); 
+    for (let i = 0; i < surrounding.length; i++) {   
+        
         let x = surrounding[i][0] + c[0];
         let y = surrounding[i][1] + c[1];  
         let checkCell = getCell(x, y);
+        console.log(checkCell, x ,y); 
         id("btn" + checkCell).style.visibility = "hidden"; 
-        shownCount++;
+        
         if (minesArray[checkCell] == "" && !blankShown.includes(checkCell)) {
             recursiveShowNearby(checkCell);
-            return;
         }                
     }
 }
