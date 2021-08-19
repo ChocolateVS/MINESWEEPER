@@ -255,26 +255,49 @@ function menu(i) {
 }
 
 function save() {
-    //width = id("widthCount");
-    //height = id("heightCount");
-    mines = id("minesCount");
+    //width = id("widthCount").value;
+    //height = id("heightCount").value;
+    mines = id("minesSlider").value;
     reset(0);
 }
-id("minesSlider").addEventListener("change", function() {
+id("minesSlider").addEventListener("input", function() {
     id("mineCount").textContent = id("minesSlider").value;
+    estDiff();
 }, false);
 
 id("widthSlider").addEventListener("change", function() {
     id("widthCount").textContent = id("widthSlider").value;
     id("minesSlider").setAttribute("max", width * height);
+    estDiff();
 }, false);
 
 id("heightSlider").addEventListener("change", function() {
     id("heightCount").textContent = id("heightSlider").value;
-    id("minesSlider").setAttribute("max", width * height);
+    id("minesSlider").setAttribute("max", width * height - 1);
+    estDiff();
 }, false);
 
+function estDiff() {
+    let size = id("widthSlider").value * id("heightSlider").value;
+    let p = Math.round(id("minesSlider").value / size * 100);   
+    let d;
 
+    if (p <= 5) d = 0;
+    else if (p <= 10) d = 1;
+    else if (p <= 15) d = 2;
+    else if (p <= 20) d = 3;
+    else if (p <= 25) d = 4;
+    else if (p <= 30) d = 5;
+    else if (p <= 40) d = 6;
+    else if (p <= 50) d = 7;
+    else if (p <= 80) d = 8;
+    else d = 9;
+
+    id("percentage").innerHTML = "MINES: ~" + p + " %";
+    id("difficulty").innerHTML = "DIFFICULTY: " + diff[d];
+}
+
+let diff = ["ONE CLICK...", "EEEEEZZZZ", "OK", "OK OK", "EEEEEKKKK", "BIG EEEEEK", "GENIUS", "r/MILDY INFURIATING", "IMPOSSIBLE", "GIVE. UP."];
 /*
 - Menu Overlay for customisation - Set mines and grid size 
 - Sound Effects
