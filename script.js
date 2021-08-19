@@ -25,6 +25,14 @@ let images = ["blank.png", "flag_red.png", "question.png"];
 let screen_width = window.screen.width;
 let screen_height =window.screen.height;
 
+//SOUNDS
+let explosionSound = new Audio("sounds/explosion.mp3"); // buffers automatically when created
+let clickSound = new Audio("sounds/click.wav");
+let clearSound = new Audio("sounds/clear.wav");
+let flagOnSound = new Audio("sounds/flag.wav");
+let flagOffSound = new Audio("sounds/unflag.wav");
+let winSound = new Audio("sounds/gameWin.wav");
+
 generateMenu();
 save();
 
@@ -146,7 +154,8 @@ function cellClicked(cell) {
                     cellClicked(cell);
                     return;
                 }
-                alert("UR BADDDDDDDDD HAHAHAHA :)");
+                //alert("UR BADDDDDDDDD HAHAHAHA :)");
+                explosionSound.play();
                 game_state == 1;
                 for (let i = 0; i < minesArray.length; i++) {
                     if (btnState[i].state == "1") {
@@ -164,14 +173,17 @@ function cellClicked(cell) {
             }
             else if (minesArray[cell] == ""){
                 blankShown = [];
+                clearSound.play();
                 recursiveShowNearby(cell);
             }
+            else clickSound.play(); 
             if (size - mines == shownCount) {
                 for (let i = 0; i < minesArray.length; i++) {
                     if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "mine_green.png");
                 }
                 game_state = 1;
-                alert("YOU WIN!!!!!!!!!!!");                              
+                winSound.play();
+                //alert("YOU WIN!!!!!!!!!!!");                              
             }
         }
     }
@@ -244,8 +256,14 @@ function checkBoundaries(c) {
 }
 
 function cellRightClicked(btn) {
-    if(btnState[btn.name].state == 0) score--;
-    else if (btnState[btn.name].state == 1) score++;
+    if(btnState[btn.name].state == 0) {
+        score--;
+        flagOnSound.play();
+    }
+    else if (btnState[btn.name].state == 1) {
+        score++; 
+        flagOffSound.play();
+    }
     id("score").innerHTML = "MINES: " + score;
     btnState[btn.name].state ++;
     if (btnState[btn.name].state == 3) btnState[btn.name].state = 0;
@@ -376,4 +394,6 @@ function estDiff(t) {
 - Middle Click
 - Timer
 - View-port
+- End Game Overlay
+- Show Incorrect Flags
 */
