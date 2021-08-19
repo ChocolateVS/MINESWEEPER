@@ -1,31 +1,20 @@
 function id(id) { return document.getElementById(id)}
-//CONSTANTS
-var width = 30;//prompt("Please Enter Grid Width");
-var height = 16;//prompt("Please Enter Grid Height");
 
+var width = 30;
+var height = 16;
 var size = width * height;
-
 var mines = 99;
-
 var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
-
 let images = ["blank2.png", "flag2.png", "question2.png"];
-
 var minesArray = [];
-
 var game_state = 0;
-
 var blankShown = [];
-
 var btnState = [];
-
 let score = mines;
-
 let body = id("body");
-
 let shownCount = 0;
-
-reset();
+let timerStarted = false;
+reset(0);
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -34,67 +23,56 @@ function shuffleArray(array) {
     }
 };
 
+function newElement(id, classname, type, text, att, appendTo, append) {
+    let element = document.createElement(type);
+    if (att.length > 0) att.forEach((e) => { element.setAttribute(e[0], e[1]) } );
+    if (type == "h1" || type == "h2") element.innerHTML = text;
+    if (classname == "resetBtn") element.textContent = text;
+    element.id = id;
+    element.className = classname;
+    if (append) appendTo.appendChild(element); 
+    else return element;
+}
 function drawGrid() {
     body.innerHTML = '';   
-
-    let header = document.createElement("h1");
-    header.innerHTML = "VERY AMAZING MINE SWEEPER ;)";
-    body.appendChild(header); 
-
-    let s = document.createElement("h2");
-    s.className = "score";
-    s.id = "score";
-    s.innerHTML = "MINES: " + score;
-    body.appendChild(s); 
-
-    let grid = document.createElement("div");
-    grid.id = "grid";
+    
+    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true); 
+    newElement("score", "score", "h2", "MINES: " + score, [], body, true); 
+    let grid = newElement("grid", "grid", "div", "", [], null, false); 
     
     for (let i = 0; i < minesArray.length; i++) {
         let cell = document.createElement("div");
-             
         cell.className = "cell";
         cell.id = i;
 
         var type = checkSurround(i);
         
         if (type != 0) {
-            if (type == "%") {
-                let img = document.createElement("img");
-                img.setAttribute("src", "mine2.png");
-                img.className = "mine";
-                img.id = "mineimg" + i;
-                cell.appendChild(img)
-            }
+            if (type == "%") newElement("mineimg" + i, "mine", "img", "", [["src", "mine2.png"]], cell, true);
             else cell.innerHTML = type;
             minesArray[i] = type;
         }
         
         cell.style.color = colors[type - 1];
 
-        let button = document.createElement("input");
-        button.className = "button";
-        button.id = "btn" + i;
-        button.setAttribute("onclick", "cellClicked(" + i + ")");
-        button.setAttribute("type", "image");
-        button.setAttribute("src", images[0]);
-        button.setAttribute("name", i);
+        grid.appendChild(cell);
+
+        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", images[0]], ["name", i], ["onclick", "cellClicked(" + i + ")"]], grid, true);
+
         let btn = {
-            id: button.id,
+            id: "btn" + i,
             state: 0
         }
         btnState.push(btn);
-        grid.appendChild(cell);
-        grid.appendChild(button);
-        
         body.appendChild(grid);
     }
 
-    var resetBtn = document.createElement("button");
-    resetBtn.className = "resetBtn";
-    resetBtn.setAttribute("onclick", "reset()");
-    resetBtn.innerHTML = "RESET";
-    body.appendChild(resetBtn);
+    var bottomMenu = newElement("bottomMenu", "bottomMenu", "div", "", [], null, false);
+
+    newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], bottomMenu, true);
+    newElement("restartBtn", "resetBtn", "button", "PLAY AGAIN (R)", [["onclick", "reset(1)"]], bottomMenu, true);
+    
+    body.appendChild(bottomMenu);
 }
 
 function cellClicked(cell) {
@@ -106,13 +84,11 @@ function cellClicked(cell) {
                 alert("UR BADDDDDDDDD HAHAHAHA :)");
                 game_state == 1;
                 for (let i = 0; i < minesArray.length; i++) {
-                    //if (btnState[i].state != 1) 
                     id("btn" + i).style.visibility = "hidden";
                 }
                 id("mineimg" + cell).setAttribute("src", "mine_red.png")
             }
             else if (minesArray[cell] == ""){
-                console.log(minesArray[cell]);
                 blankShown = [];
                 recursiveShowNearby(cell);
             }
@@ -146,17 +122,15 @@ function checkSurround(cell) {
 }
 
 function recursiveShowNearby(cell) {
-    console.log(id("btn" + cell).style.visibility);
+
     if (id("btn" + cell).style.visibility != "hidden") shownCount++;
     id("btn" + cell).style.visibility = "hidden";
 
     blankShown.push(cell);
-
     let c = getXY(cell);
 
     let surrounding = checkBoundaries(c);
     for (let i = 0; i < surrounding.length; i++) {   
-        
         let x = surrounding[i][0] + c[0];
         let y = surrounding[i][1] + c[1];  
         let checkCell = getCell(x, y);
@@ -175,9 +149,8 @@ function getXY (cell) {
     return [x, y];
 }
 
-function getCell(x, y) {
-    return ((y) * 30) + x;
-}
+function getCell(x, y) { return ((y) * 30) + x; }
+
 
 function checkBoundaries(c) {
     if (c[0] == 0 && c[1] == 0) return [[0, 1], [1, 0], [1, 1]];
@@ -190,15 +163,6 @@ function checkBoundaries(c) {
     if (c[1] == 15 && c[0] != 0 && c[0] != 29) return [[-1, -1], [-1, 0], [0, -1], [1, -1], [1, 0]];
     return [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]; 
 }
-
-document.addEventListener('contextmenu', function(event) {
-    let button = event.target;
-    event.preventDefault();
-    if (button.className == "button") {
-        cellRightClicked(button);
-    }
-    
-});
 
 function cellRightClicked(btn) {
     if(btnState[btn.name].state == 0) score--;
@@ -215,15 +179,31 @@ function cellRightClicked(btn) {
 
 }
 
-function reset() {
-    minesArray = [];
+function reset(type) {
+    if (type == 0) {
+        minesArray = [];
+        for (let i = 0; i < size; i++)  minesArray[i] = "";
+        for (let i = 0; i < mines; i++) { minesArray[i] = "%";}
+        shuffleArray(minesArray);
+    }
     game_state = 0;
     blankShown = [];
     btnState = [];
-    for (let i = 0; i < size; i++)  minesArray[i] = "";
-    for (let i = 0; i < mines; i++) { minesArray[i] = "%";}
-    shuffleArray(minesArray);
     drawGrid();
     score = mines;
     shownCount = 0;
 }
+
+document.addEventListener('contextmenu', function(event) {
+    let button = event.target;
+    event.preventDefault();
+    if (button.className == "button") {
+        cellRightClicked(button);
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    let key = event.key;
+    if (key = "r") reset(1)
+    else if (key = "n") reset(0);
+});
