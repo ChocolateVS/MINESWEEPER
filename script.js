@@ -1,16 +1,11 @@
 function id(id) { return document.getElementById(id)}
 
-var width = 30;
-var height = 16;
-
+var width;
+var height;
 var border_width;
-
 var cell_width;
- 
 var size;
-var mines = 99;
-var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
-let images = ["blank.png", "flag_red.png", "question.png"];
+var mines;
 var minesArray = [];
 var game_state = 0;
 var blankShown = [];
@@ -20,15 +15,18 @@ let body = id("gameBody");
 let allShown = [];
 let shownCount = 0;
 let timerStarted = false;
-
+let temp_width;
+let temp_height;
+let minePer = Math.round(id("minesSlider").value / ((id("widthSlider").value * id("heightSlider").value)) * 100);
+let mineDiff = "EEEKKKK";
+let diff = ["ONE CLICK...", "EEEEEZZZZ", "OK", "OK OK", "EEEEKKK", "BIG EEEEEK", "GENIUS", "r/MILDY INFURIATING", "IMPOSSIBLE", "GIVE. UP."];
+var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
+let images = ["blank.png", "flag_red.png", "question.png"];
 let screen_width = window.screen.width;
 let screen_height =window.screen.height;
 
-//let titleDiv = newElement("titlveDiv", "titleDiv", "div", "", [], null, false );
-//titleDiv.appendChild(newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], main_body, false ));
-//body.appendChild(titleDiv);
 generateMenu();
-reset(0);
+save();
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -60,20 +58,19 @@ function drawGrid() {
     let cell_width;
 
     if (screen_width / width >= screen_height / height) {
-        grid_height = screen_height * 0.7;
+        grid_height = Math.round(screen_height * 0.7);
 
         cell_width = (grid_height / (height));
 
         grid_width = cell_width * width;
     }
     else {
-        grid_width = screen_width * 0.7;
+        grid_width = Math.round(screen_width * 0.7);
 
         cell_width = (grid_width / (width));
 
         grid_height = cell_width * height;
     }
-    console.log(grid_height, grid_width);
     grid.style.width = grid_width + "px";
     grid.style.height = grid_height + "px";
     newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true)
@@ -86,8 +83,11 @@ function drawGrid() {
         cell.id = i;
         cell.style.width = cell_width + "px";
         cell.style.height = cell_width + "px";
-        let boxshadow = cell_width * 0.02;
-        cell.style.boxShadow = "0px 0px 0px " + boxshadow + "px #bfbfbf"
+        let boxshadow = cell_width * 0.05;
+        cell.style.boxShadow = "inset 0px 0px 0px " + boxshadow + "px #bfbfbf";
+        //cell.style.boxShadow = "inset " + boxshadow + "px " + boxshadow + "px " + boxshadow + "px " + boxshadow + "px #bfbfbf";
+        let font_size = cell_width / 1.75
+        cell.style.fontSize = font_size + "px";
         //cell.style.boxShadow = "0px 0px 0px " + boxshadow + "px blue;"
 
         var type = checkSurround(i);
@@ -102,14 +102,19 @@ function drawGrid() {
 
         grid.appendChild(cell);
 
-        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", images[0]], ["name", i], ["onclick", "cellClicked(" + i + ")"]], null, false);
-        button_width = cell_width + border_width;
-        button_height = cell_width + border_width;
+        let button_div = newElement("btn_div" + i, "button_div", "div", "", [], null, false);
+        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", images[0]], ["name", i], ["onclick", "cellClicked(" + i + ")"]], button_div, false);
+        
+        border_width = cell_width;
+        button_width = border_width - (boxshadow * 2);
         button.style.width = button_width + "px";
-        button.style.height = button_height + "px";
-        button.style.marginLeft = - button_width + "px";
-        //grid.appendChild(button);
-
+        button.style.height = button_width + "px";
+        button_div.style.width = border_width + "px";
+        button_div.style.height = border_width + "px";
+        button_div.style.marginLeft = - border_width + "px";
+        button_div.style.boxShadow = "inset 0px 0px 0px " + boxshadow + "px #bfbfbf";
+        button_div.appendChild(button);
+        grid.appendChild(button_div)
         let btn = {
             id: "btn" + i,
             state: 0
@@ -267,6 +272,7 @@ function reset(type) {
     drawGrid();
     score = mines;
     shownCount = 0;
+    id("score").innerHTML = "MINES: " + mines;
 }
 
 document.addEventListener('contextmenu', function(event) {
@@ -299,13 +305,23 @@ function menu(i) {
         return;
     }
     id("menu").style.visibility = "visible";
+    id("mineCount").textContent = mines;
+    id("widthCount").textContent = width;
+    id("heightCount").textContent = height;
+    id("minesSlider").value = mines;
+    id("widthSlider").value = width;
+    id("heightSlider").value = height;
+    id("percentage").textContent = "MINES: ~ " + minePer  + " %";
+    id("difficulty").textContent = "DIFFICULTY: " + mineDiff;
 }
 
 function save() {
     width = id("widthSlider").value;
     height = id("heightSlider").value;
+    temp_height = height;
+    temp_width = width;
     mines = id("minesSlider").value;
-    console.log(width, height);
+    estDiff(1);
     reset(0);
 }
 id("minesSlider").addEventListener("input", function() {
@@ -315,20 +331,24 @@ id("minesSlider").addEventListener("input", function() {
 
 id("widthSlider").addEventListener("input", function() {
     id("widthCount").textContent = id("widthSlider").value;
-    //id("minesSlider").setAttribute("max", width * height);
+    temp_width = id("widthSlider").value;
+    id("minesSlider").setAttribute("max", (temp_width * temp_height) - 1 );
+    id("mineCount").textContent = id("minesSlider").value;
     estDiff();
 }, false);
 
 id("heightSlider").addEventListener("input", function() {
     id("heightCount").textContent = id("heightSlider").value;
-    //id("minesSlider").setAttribute("max", width * height - 1);
+    temp_height = id("heightSlider").value;
+    id("minesSlider").setAttribute("max", (temp_width * temp_height) - 1);
+    id("mineCount").textContent = id("minesSlider").value;
     estDiff();
 }, false);
 
-function estDiff() {
-    let size = id("widthSlider").value * id("heightSlider").value;
-    let p = Math.round(id("minesSlider").value / size * 100);   
+function estDiff(t) {
+    let p = Math.round(id("minesSlider").value / ((id("widthSlider").value * id("heightSlider").value)) * 100);;
     let d;
+
 
     if (p <= 5) d = 0;
     else if (p <= 10) d = 1;
@@ -341,14 +361,19 @@ function estDiff() {
     else if (p <= 80) d = 8;
     else d = 9;
 
-    id("percentage").innerHTML = "MINES: ~" + p + " %";
-    id("difficulty").innerHTML = "DIFFICULTY: " + diff[d];
+    if (t == 1) {
+        minePer = p;
+        mineDiff = diff[d];
+    }
+    id("percentage").textContent = "MINES: ~ " + p + " %";
+    id("difficulty").textContent = "DIFFICULTY: " + diff[d];
+
 }
 
-let diff = ["ONE CLICK...", "EEEEEZZZZ", "OK", "OK OK", "EEEEEKKKK", "BIG EEEEEK", "GENIUS", "r/MILDY INFURIATING", "IMPOSSIBLE", "GIVE. UP."];
 /*
-- Menu Overlay for customisation - Set mines and grid size 
+- 100% Mines Breaks it???
 - Sound Effects
 - Middle Click
 - Timer
+- View-port
 */
