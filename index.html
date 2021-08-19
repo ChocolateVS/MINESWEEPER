@@ -11,7 +11,27 @@
     <div id="gameBody">
 
     </div>   
-    <footer>BETA 2.6 | Rowan Thorley</footer>
+    <div id="menu" class="menu">
+        <div id="mines_div" class="menu-item">
+            <h2>MINES: </h2>
+            <input type="range" min="1" max="480" value="99" class="slider" id="minesSlider">
+            <h2 class="count" id="mineCount">99</h2>
+        </div>
+
+        <div id="width_div" class="menu-item">
+            <h2>WIDTH: </h2>
+            <input type="range" min="1" max="100" value="30" class="slider" id="widthSlider">
+            <h2 class="count" id="widthCount">30</h2>
+        </div>
+
+        <div id="height_div" class="menu-item">
+            <h2>HEIGHT: </h2>
+            <input type="range" min="1" max="100" value="16" class="slider" id="heightSlider">
+            <h2 class="count" id="heightCount">16</h2>
+        </div>
+
+    </div>
+    <footer>BETA 2.7 | Rowan Thorley</footer>
 </body>
 <script src="script.js"></script>
 </html>

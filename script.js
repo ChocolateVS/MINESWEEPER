@@ -20,6 +20,7 @@ let timerStarted = false;
 //let titleDiv = newElement("titlveDiv", "titleDiv", "div", "", [], null, false );
 //titleDiv.appendChild(newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], main_body, false ));
 //body.appendChild(titleDiv);
+generateMenu();
 reset(0);
 
 function shuffleArray(array) {
@@ -40,9 +41,8 @@ function newElement(id, classname, type, text, att, appendTo, append) {
     else return element;
 }
 function drawGrid() {
-    body.innerHTML = "";   
-    
-    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true )
+    body.innerHTML = ""; 
+    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true)
     newElement("score", "score", "h2", "MINES: " + score, [], body, true); 
     let grid = newElement("grid", "grid", "div", "", [], null, false); 
     
@@ -77,7 +77,7 @@ function drawGrid() {
         
     var bottomMenu = newElement("bottomMenu", "bottomMenu", "div", "", [], null, false);
 
-    newElement("menuBtn", "resetBtn", "button", "MENU (ESC / M)", [["onclick", "menu()"]], bottomMenu, true);
+    newElement("menuBtn", "resetBtn", "button", "MENU (ESC / M)", [["onclick", "menu(0)"]], bottomMenu, true);
     newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], bottomMenu, true);
     newElement("restartBtn", "resetBtn", "button", "PLAY AGAIN (R)", [["onclick", "reset(1)"]], bottomMenu, true);
     
@@ -213,6 +213,7 @@ function reset(type) {
         for (let i = 0; i < mines; i++) { minesArray[i] = "%";}
         shuffleArray(minesArray);
     }
+    menu(1);
     game_state = 0;
     blankShown = [];
     btnState = [];
@@ -235,8 +236,48 @@ document.addEventListener('keydown', function(event) {
     else if (key == "n") reset(0);
 });
 
+function generateMenu() {
+    //Buttons
+    newElement("buttons_div", "buttons_div", "div", "", [], id("menu"), true);
+    newElement("saveBtn", "resetBtn", "button", "**SAVE**", [["onclick", "save()"]], id("buttons_div"), true);
+    newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], id("buttons_div"), true);
+    newElement("restartBtn", "resetBtn", "button", "PLAY AGAIN (R)", [["onclick", "reset(1)"]], id("buttons_div"), true);
+    newElement("closeBtn", "resetBtn", "button", "CLOSE MENU", [["onclick", "menu(1)"]], id("buttons_div"), true);
+
+}
+
+function menu(i) {
+    if (i == 1) {
+        id("menu").style.visibility = "hidden";
+        return;
+    }
+    id("menu").style.visibility = "visible";
+}
+
+function save() {
+    //width = id("widthCount");
+    //height = id("heightCount");
+    mines = id("minesCount");
+    reset(0);
+}
+id("minesSlider").addEventListener("change", function() {
+    id("mineCount").textContent = id("minesSlider").value;
+}, false);
+
+id("widthSlider").addEventListener("change", function() {
+    id("widthCount").textContent = id("widthSlider").value;
+    id("minesSlider").setAttribute("max", width * height);
+}, false);
+
+id("heightSlider").addEventListener("change", function() {
+    id("heightCount").textContent = id("heightSlider").value;
+    id("minesSlider").setAttribute("max", width * height);
+}, false);
+
+
 /*
 - Menu Overlay for customisation - Set mines and grid size 
 - Sound Effects
 - Middle Click
+- Timer
 */
