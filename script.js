@@ -3,7 +3,7 @@ function id(id) { return document.getElementById(id)}
 var width = 30;
 var height = 16;
 var size = width * height;
-var mines = 99;
+var mines = 10;
 var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
 let images = ["blank2.png", "flag2.png", "question2.png"];
 var minesArray = [];
@@ -11,9 +11,14 @@ var game_state = 0;
 var blankShown = [];
 var btnState = [];
 let score = mines;
-let body = id("body");
+let body = id("gameBody");
+//let main_body = id("mainBody");
 let shownCount = 0;
 let timerStarted = false;
+
+//let titleDiv = newElement("titlveDiv", "titleDiv", "div", "", [], null, false );
+//titleDiv.appendChild(newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], main_body, false ));
+//body.appendChild(titleDiv);
 reset(0);
 
 function shuffleArray(array) {
@@ -34,9 +39,9 @@ function newElement(id, classname, type, text, att, appendTo, append) {
     else return element;
 }
 function drawGrid() {
-    body.innerHTML = '';   
+    body.innerHTML = "";   
     
-    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true); 
+    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true )
     newElement("score", "score", "h2", "MINES: " + score, [], body, true); 
     let grid = newElement("grid", "grid", "div", "", [], null, false); 
     
@@ -64,9 +69,11 @@ function drawGrid() {
             state: 0
         }
         btnState.push(btn);
-        body.appendChild(grid);
+        
     }
 
+    body.appendChild(grid);
+        
     var bottomMenu = newElement("bottomMenu", "bottomMenu", "div", "", [], null, false);
 
     newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], bottomMenu, true);
@@ -86,15 +93,18 @@ function cellClicked(cell) {
                 for (let i = 0; i < minesArray.length; i++) {
                     id("btn" + i).style.visibility = "hidden";
                 }
-                id("mineimg" + cell).setAttribute("src", "mine_red.png")
+                id("mineimg" + cell).setAttribute("src", "mine_red.png");
             }
             else if (minesArray[cell] == ""){
                 blankShown = [];
                 recursiveShowNearby(cell);
             }
             if (size - mines == shownCount) {
-                alert("YOU WIN!!!!!!!!!!!");
+                for (let i = 0; i < minesArray.length; i++) {
+                    if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "mine_green.png");
+                }
                 game_state = 1;
+                alert("YOU WIN!!!!!!!!!!!");                              
             }
         }
     }
@@ -154,13 +164,13 @@ function getCell(x, y) { return ((y) * 30) + x; }
 
 function checkBoundaries(c) {
     if (c[0] == 0 && c[1] == 0) return [[0, 1], [1, 0], [1, 1]];
-    if (c[0] == 29 && c[1] == 15) return [[0, -1], [-1, 0], [-1, -1]];
-    if (c[0] == 0 && c[1] == 15) return [[0, -1], [1, 0], [1, -1]];
-    if (c[0] == 29 && c[1] == 0) return [[0, 1], [-1, 0], [-1, 1]];
-    if (c[0] == 0 && c[1] != 0 && c[1] != 15) return [[0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
-    if (c[0] == 29 && c[1] != 0 && c[1] != 15) return [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1]];
-    if (c[1] == 0 && c[0] != 0 && c[0] != 29) return [[-1, 0], [-1, 1], [0, 1], [1, 0], [1, 1]];
-    if (c[1] == 15 && c[0] != 0 && c[0] != 29) return [[-1, -1], [-1, 0], [0, -1], [1, -1], [1, 0]];
+    if (c[0] == width - 1 && c[1] == height - 1) return [[0, -1], [-1, 0], [-1, -1]];
+    if (c[0] == 0 && c[1] == height - 1) return [[0, -1], [1, 0], [1, -1]];
+    if (c[0] == width - 1 && c[1] == 0) return [[0, 1], [-1, 0], [-1, 1]];
+    if (c[0] == 0 && c[1] != 0 && c[1] != height - 1) return [[0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+    if (c[0] == width - 1 && c[1] != 0 && c[1] != height - 1) return [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1]];
+    if (c[1] == 0 && c[0] != 0 && c[0] != width - 1) return [[-1, 0], [-1, 1], [0, 1], [1, 0], [1, 1]];
+    if (c[1] == height - 1 && c[0] != 0 && c[0] != width - 1) return [[-1, -1], [-1, 0], [0, -1], [1, -1], [1, 0]];
     return [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]; 
 }
 
@@ -204,6 +214,14 @@ document.addEventListener('contextmenu', function(event) {
 
 document.addEventListener('keydown', function(event) {
     let key = event.key;
-    if (key = "r") reset(1)
-    else if (key = "n") reset(0);
+    if (key == "r") reset(1);
+    else if (key == "n") reset(0);
 });
+
+/*
+
+- Show correct flags when loose
+- Set mines and grid size 
+- Sound Effects
+- Endgmae, darken shown cells
+*/
