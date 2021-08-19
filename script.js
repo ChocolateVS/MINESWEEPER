@@ -12,6 +12,7 @@ var blankShown = [];
 var btnState = [];
 let score = mines;
 let body = id("gameBody");
+let allShown = [];
 //let main_body = id("mainBody");
 let shownCount = 0;
 let timerStarted = false;
@@ -53,7 +54,7 @@ function drawGrid() {
         var type = checkSurround(i);
         
         if (type != 0) {
-            if (type == "%") newElement("mineimg" + i, "mine", "img", "", [["src", "mine2.png"]], cell, true);
+            if (type == "%") newElement("mineimg" + i, "mine", "img", "", [["src", "mine.png"]], cell, true);
             else cell.innerHTML = type;
             minesArray[i] = type;
         }
@@ -86,6 +87,7 @@ function cellClicked(cell) {
     if (game_state == 0) {        
         if (btnState[cell].state == 0) {
             id("btn" + cell).style.visibility = "hidden";
+            id(cell).style.backgroundColor = "#9eabb8";
             shownCount++;
             if (minesArray[cell] == "%") {
                 if (shownCount == 1) {
@@ -140,8 +142,9 @@ function recursiveShowNearby(cell) {
 
     if (id("btn" + cell).style.visibility != "hidden") shownCount++;
     id("btn" + cell).style.visibility = "hidden";
-
+    id(cell).style.backgroundColor = "#9eabb8"
     blankShown.push(cell);
+
     let c = getXY(cell);
 
     let surrounding = checkBoundaries(c);
@@ -151,7 +154,8 @@ function recursiveShowNearby(cell) {
         let checkCell = getCell(x, y);
         if (id("btn" + checkCell).style.visibility != "hidden") shownCount++;
         id("btn" + checkCell).style.visibility = "hidden"; 
-        
+        id(checkCell).style.backgroundColor = "#9eabb8";
+
         if (minesArray[checkCell] == "" && !blankShown.includes(checkCell)) {
             recursiveShowNearby(checkCell);
         }                
