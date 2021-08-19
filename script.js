@@ -2,7 +2,12 @@ function id(id) { return document.getElementById(id)}
 
 var width = 30;
 var height = 16;
-var size = width * height;
+
+var border_width;
+
+var cell_width;
+ 
+var size;
 var mines = 99;
 var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
 let images = ["blank.png", "flag_red.png", "question.png"];
@@ -13,9 +18,11 @@ var btnState = [];
 let score = mines;
 let body = id("gameBody");
 let allShown = [];
-//let main_body = id("mainBody");
 let shownCount = 0;
 let timerStarted = false;
+
+let screen_width = window.screen.width;
+let screen_height =window.screen.height;
 
 //let titleDiv = newElement("titlveDiv", "titleDiv", "div", "", [], null, false );
 //titleDiv.appendChild(newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], main_body, false ));
@@ -40,16 +47,48 @@ function newElement(id, classname, type, text, att, appendTo, append) {
     if (append) appendTo.appendChild(element); 
     else return element;
 }
+
 function drawGrid() {
-    body.innerHTML = ""; 
+
+    body.innerHTML = "";
+
+    screen_width = window.screen.width;
+    screen_height = window.screen.height;
+
+    let grid = newElement("grid", "grid", "div", "", [], null, false); 
+
+    let cell_width;
+
+    if (screen_width / width >= screen_height / height) {
+        grid_height = screen_height * 0.7;
+
+        cell_width = (grid_height / (height));
+
+        grid_width = cell_width * width;
+    }
+    else {
+        grid_width = screen_width * 0.7;
+
+        cell_width = (grid_width / (width));
+
+        grid_height = cell_width * height;
+    }
+    console.log(grid_height, grid_width);
+    grid.style.width = grid_width + "px";
+    grid.style.height = grid_height + "px";
     newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true)
     newElement("score", "score", "h2", "MINES: " + score, [], body, true); 
-    let grid = newElement("grid", "grid", "div", "", [], null, false); 
     
+
     for (let i = 0; i < minesArray.length; i++) {
         let cell = document.createElement("div");
         cell.className = "cell";
         cell.id = i;
+        cell.style.width = cell_width + "px";
+        cell.style.height = cell_width + "px";
+        let boxshadow = cell_width * 0.02;
+        cell.style.boxShadow = "0px 0px 0px " + boxshadow + "px #bfbfbf"
+        //cell.style.boxShadow = "0px 0px 0px " + boxshadow + "px blue;"
 
         var type = checkSurround(i);
         
@@ -63,7 +102,13 @@ function drawGrid() {
 
         grid.appendChild(cell);
 
-        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", images[0]], ["name", i], ["onclick", "cellClicked(" + i + ")"]], grid, true);
+        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", images[0]], ["name", i], ["onclick", "cellClicked(" + i + ")"]], null, false);
+        button_width = cell_width + border_width;
+        button_height = cell_width + border_width;
+        button.style.width = button_width + "px";
+        button.style.height = button_height + "px";
+        button.style.marginLeft = - button_width + "px";
+        //grid.appendChild(button);
 
         let btn = {
             id: "btn" + i,
@@ -178,7 +223,7 @@ function getXY (cell) {
     return [x, y];
 }
 
-function getCell(x, y) { return ((y) * 30) + x; }
+function getCell(x, y) { return ((y) * width) + x; }
 
 
 function checkBoundaries(c) {
@@ -207,6 +252,8 @@ function cellRightClicked(btn) {
 }
 
 function reset(type) {
+    size = width * height;
+
     if (type == 0) {
         minesArray = [];
         for (let i = 0; i < size; i++)  minesArray[i] = "";
@@ -255,9 +302,10 @@ function menu(i) {
 }
 
 function save() {
-    //width = id("widthCount").value;
-    //height = id("heightCount").value;
+    width = id("widthSlider").value;
+    height = id("heightSlider").value;
     mines = id("minesSlider").value;
+    console.log(width, height);
     reset(0);
 }
 id("minesSlider").addEventListener("input", function() {
@@ -265,15 +313,15 @@ id("minesSlider").addEventListener("input", function() {
     estDiff();
 }, false);
 
-id("widthSlider").addEventListener("change", function() {
+id("widthSlider").addEventListener("input", function() {
     id("widthCount").textContent = id("widthSlider").value;
-    id("minesSlider").setAttribute("max", width * height);
+    //id("minesSlider").setAttribute("max", width * height);
     estDiff();
 }, false);
 
-id("heightSlider").addEventListener("change", function() {
+id("heightSlider").addEventListener("input", function() {
     id("heightCount").textContent = id("heightSlider").value;
-    id("minesSlider").setAttribute("max", width * height - 1);
+    //id("minesSlider").setAttribute("max", width * height - 1);
     estDiff();
 }, false);
 

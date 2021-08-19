@@ -14,21 +14,17 @@ body, html {
 #grid {
     background-color:#7c7f84;
     border:6px solid #271717da;
-    width:900px;
-    height:480px;
     display:flex;
     flex-wrap:wrap;
     flex-direction:row;
+    align-content:flex-start;
 }
 
 .cell {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #bfbfbf;
     display: flex;
     justify-content:center;
     align-items:center;
-    font-size:25px;
+    font-size:200%;
 }
 
 .button {
