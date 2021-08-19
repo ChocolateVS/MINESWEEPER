@@ -98,6 +98,13 @@ function cellClicked(cell) {
                 alert("UR BADDDDDDDDD HAHAHAHA :)");
                 game_state == 1;
                 for (let i = 0; i < minesArray.length; i++) {
+                    if (btnState[i].state == "1") {
+                        if (minesArray[i] == "%") {
+                            id("mineimg" + i).setAttribute("src", "flag_green.png");
+                            id(i).style.backgroundColor = "#9eabb8";
+                        }
+
+                    }
                     id("btn" + i).style.visibility = "hidden";
                 }
                 id("mineimg" + cell).setAttribute("src", "mine_red.png");
