@@ -5,7 +5,7 @@ var height = 16;
 var size = width * height;
 var mines = 99;
 var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
-let images = ["blank2.png", "flag2.png", "question2.png"];
+let images = ["blank.png", "flag_red.png", "question.png"];
 var minesArray = [];
 var game_state = 0;
 var blankShown = [];
@@ -77,6 +77,7 @@ function drawGrid() {
         
     var bottomMenu = newElement("bottomMenu", "bottomMenu", "div", "", [], null, false);
 
+    newElement("menuBtn", "resetBtn", "button", "MENU (ESC / M)", [["onclick", "menu()"]], bottomMenu, true);
     newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], bottomMenu, true);
     newElement("restartBtn", "resetBtn", "button", "PLAY AGAIN (R)", [["onclick", "reset(1)"]], bottomMenu, true);
     
@@ -100,10 +101,12 @@ function cellClicked(cell) {
                 for (let i = 0; i < minesArray.length; i++) {
                     if (btnState[i].state == "1") {
                         if (minesArray[i] == "%") {
-                            id("mineimg" + i).setAttribute("src", "flag_green.png");
-                            id(i).style.backgroundColor = "#9eabb8";
+                            id("mineimg" + i).setAttribute("src", "flag_green2.png");                           
                         }
-
+                        else if (minesArray[i] != "%") {
+                            id("btn" + i).setAttribute("src", "flag_red2.png");                          
+                        }
+                        id(i).style.backgroundColor = "#9eabb8";
                     }
                     id("btn" + i).style.visibility = "hidden";
                 }
@@ -233,9 +236,7 @@ document.addEventListener('keydown', function(event) {
 });
 
 /*
-
-- Show correct flags when loose
-- Set mines and grid size 
+- Menu Overlay for customisation - Set mines and grid size 
 - Sound Effects
-- Endgmae, darken shown cells
+- Middle Click
 */
