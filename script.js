@@ -3,7 +3,7 @@ function id(id) { return document.getElementById(id)}
 var width = 30;
 var height = 16;
 var size = width * height;
-var mines = 10;
+var mines = 99;
 var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
 let images = ["blank2.png", "flag2.png", "question2.png"];
 var minesArray = [];
