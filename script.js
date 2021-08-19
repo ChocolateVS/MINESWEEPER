@@ -83,11 +83,16 @@ function drawGrid() {
 }
 
 function cellClicked(cell) {
-    if (game_state == 0) {
+    if (game_state == 0) {        
         if (btnState[cell].state == 0) {
             id("btn" + cell).style.visibility = "hidden";
             shownCount++;
             if (minesArray[cell] == "%") {
+                if (shownCount == 1) {
+                    reset(0);
+                    cellClicked(cell);
+                    return;
+                }
                 alert("UR BADDDDDDDDD HAHAHAHA :)");
                 game_state == 1;
                 for (let i = 0; i < minesArray.length; i++) {
@@ -182,8 +187,6 @@ function cellRightClicked(btn) {
     if (btnState[btn.name].state == 3) btnState[btn.name].state = 0;
     
     let state = btnState[btn.name].state;
-    
-    console.log(btnState[btn.name], images[state]);
 
     id(btn.id).setAttribute("src", images[state]);
 
