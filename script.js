@@ -334,7 +334,7 @@ document.addEventListener('contextmenu', function(event) {
 
 document.addEventListener('mousedown', function(event) {
     if (game_state == 0 && event.button == 1) { 
-        e.preventDefault();
+        event.preventDefault();
         middleClick.play();
         let class_name = event.target.className;
         let cell;

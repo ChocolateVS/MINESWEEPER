@@ -9,6 +9,7 @@ body, html {
     flex-wrap:wrap;
     flex-direction:column;
     align-content: space-evenly;
+    margin:0;
 }
 
 #grid {
