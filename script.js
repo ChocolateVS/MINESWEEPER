@@ -24,7 +24,7 @@ var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turq
 let images = ["blank.png", "flag_red.png", "question.png"];
 let screen_width = window.screen.width;
 let screen_height =window.screen.height;
-
+let darkened = [];
 //SOUNDS
 let explosionSound = new Audio("sounds/explosion.mp3"); // buffers automatically when created
 let clickSound = new Audio("sounds/click.wav");
@@ -32,6 +32,8 @@ let clearSound = new Audio("sounds/clear.wav");
 let flagOnSound = new Audio("sounds/flag.wav");
 let flagOffSound = new Audio("sounds/unflag.wav");
 let winSound = new Audio("sounds/gameWin.wav");
+let middleClick = new Audio("sounds/middleClick.wav");
+let middleUnClick = new Audio("sounds/middleClickOff.wav");
 
 generateMenu();
 save();
@@ -86,17 +88,15 @@ function drawGrid() {
     
 
     for (let i = 0; i < minesArray.length; i++) {
-        let cell = document.createElement("div");
+        let cell = document.createElement("div");      
         cell.className = "cell";
         cell.id = i;
         cell.style.width = cell_width + "px";
         cell.style.height = cell_width + "px";
         let boxshadow = cell_width * 0.05;
         cell.style.boxShadow = "inset 0px 0px 0px " + boxshadow + "px #bfbfbf";
-        //cell.style.boxShadow = "inset " + boxshadow + "px " + boxshadow + "px " + boxshadow + "px " + boxshadow + "px #bfbfbf";
         let font_size = cell_width / 1.75
         cell.style.fontSize = font_size + "px";
-        //cell.style.boxShadow = "0px 0px 0px " + boxshadow + "px blue;"
 
         var type = checkSurround(i);
         
@@ -121,6 +121,7 @@ function drawGrid() {
         button_div.style.height = border_width + "px";
         button_div.style.marginLeft = - border_width + "px";
         button_div.style.boxShadow = "inset 0px 0px 0px " + boxshadow + "px #bfbfbf";
+        //button_div.setAttribute("onauxclick", "middleClick(" + i + ")");
         button_div.appendChild(button);
         grid.appendChild(button_div)
         let btn = {
@@ -154,22 +155,7 @@ function cellClicked(cell) {
                     cellClicked(cell);
                     return;
                 }
-                //alert("UR BADDDDDDDDD HAHAHAHA :)");
-                explosionSound.play();
-                game_state == 1;
-                for (let i = 0; i < minesArray.length; i++) {
-                    if (btnState[i].state == "1") {
-                        if (minesArray[i] == "%") {
-                            id("mineimg" + i).setAttribute("src", "flag_green2.png");                           
-                        }
-                        else if (minesArray[i] != "%") {
-                            id("btn" + i).setAttribute("src", "flag_red2.png");                          
-                        }
-                        id(i).style.backgroundColor = "#9eabb8";
-                    }
-                    id("btn" + i).style.visibility = "hidden";
-                }
-                id("mineimg" + cell).setAttribute("src", "mine_red.png");
+                loose([cell]);
             }
             else if (minesArray[cell] == ""){
                 blankShown = [];
@@ -210,6 +196,56 @@ function checkSurround(cell) {
     return surrMines;
 }
 
+function checkSurroundBtn(cell, type) {
+    let c = getXY(cell);
+    let surrounding = checkBoundaries(c);
+    let cells = [];
+    let f = 0, m = 0;
+    let l = false;
+
+    for (let i = 0; i < surrounding.length; i++) {    
+        let x = surrounding[i][0] + c[0];
+        let y = surrounding[i][1] + c[1];  
+        let checkCell = getCell(x, y);
+        if (type == 0) {
+            if (btnState[checkCell].state == 0) {
+                id("btn" + checkCell).setAttribute("src", "blank_dark.png");
+                darkened.push(checkCell);
+            }          
+        }
+        else if (type == 1) {  
+            console.log(cell, btnState[checkCell]);
+            if (btnState[checkCell].state == 1) f++;
+            if (minesArray[checkCell] == "%") m++;
+        }
+        else if (type == 2) {      
+            if (minesArray[checkCell] != "%") {
+                id("btn" + checkCell).style.visibility = "hidden";  
+                id(checkCell).style.backgroundColor = "#9eabb8";             
+                allShown.push(checkCell);
+                if (minesArray[checkCell] == "") {
+                    clearSound.play();
+                    recursiveShowNearby(checkCell);
+                }                    
+            }
+            else if (btnState[checkCell].state != 1) {
+                cells.push(checkCell);
+                l = true;
+            }
+        }
+    }
+    console.log("Flags: ", f, ", Mines: ", m);
+    if (l) loose(cells);
+    if (f == m && minesArray[cell] == f) return true;
+}
+
+function unMiddleClick() {
+    darkened.forEach(e => {
+        id("btn" + e).setAttribute("src", "blank.png");
+    });
+    darkened = [];
+}
+
 function recursiveShowNearby(cell) {
 
     if (id("btn" + cell).style.visibility != "hidden") shownCount++;
@@ -241,7 +277,6 @@ function getXY (cell) {
 }
 
 function getCell(x, y) { return ((y) * width) + x; }
-
 
 function checkBoundaries(c) {
     if (c[0] == 0 && c[1] == 0) return [[0, 1], [1, 0], [1, 1]];
@@ -299,6 +334,40 @@ document.addEventListener('contextmenu', function(event) {
     if (button.className == "button") {
         cellRightClicked(button);
     }
+});
+
+document.addEventListener('mousedown', function(event) {
+    if (game_state == 0 && event.button == 1) { 
+        middleClick.play();
+        let class_name = event.target.className;
+        let cell;
+        let div_id;
+        let btn_id;
+        if (class_name == "button_div") {
+            div_id = event.target.id;
+            cell = div_id.slice(7);
+            btn_id = "btn" + cell;
+        }
+        else if (class_name == "button") {
+            btn_id = event.target.id;
+            cell = btn_id.slice(3);
+            div_id = "btn_div" + cell;
+        }
+     
+        if (class_name == "button_div" && id(btn_id).style.visibility == "hidden" && checkSurroundBtn(cell, 1)) {
+            if (minesArray[cell] != "%" && minesArray[cell] != "" ) {
+                checkSurroundBtn(cell, 2);
+            }
+        }
+        else checkSurroundBtn(cell, 0);
+    }
+});
+
+document.addEventListener('mouseup', function(event) {
+    if (event.button == 1) {
+        middleUnClick.play();
+        unMiddleClick();
+    } 
 });
 
 document.addEventListener('keydown', function(event) {
@@ -389,11 +458,31 @@ function estDiff(t) {
 }
 
 /*
-- 100% Mines Breaks it???
-- Sound Effects
 - Middle Click
 - Timer
 - View-port
 - End Game Overlay
+- 100% Mines Breaks it???
 - Show Incorrect Flags
 */
+
+function loose(cells) {
+    //alert("UR BADDDDDDDDD HAHAHAHA :)");
+    explosionSound.play();
+    game_state == 1;
+    for (let i = 0; i < minesArray.length; i++) {
+        if (btnState[i].state == "1") {
+            if (minesArray[i] == "%") {
+                id("mineimg" + i).setAttribute("src", "flag_green2.png");                           
+            }
+            else if (minesArray[i] != "%") {
+                id("btn" + i).setAttribute("src", "flag_red2.png");                          
+            }
+            id(i).style.backgroundColor = "#9eabb8";
+        }
+        id("btn" + i).style.visibility = "hidden";
+    }
+    cells.forEach(cell => {
+        id("mineimg" + cell).setAttribute("src", "mine_red.png");
+    });
+}

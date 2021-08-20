@@ -33,6 +33,7 @@ body, html {
     align-items:center;
     width:100%;
     height:100%; 
+    visibility: visible;
 }
  .button {
     z-index:1000;
@@ -41,6 +42,7 @@ body, html {
     align-items:center;
     width:100%;
     height:100%; 
+    visibility: visible;
  }
  .button_div {
     opacity:1;
