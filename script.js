@@ -163,7 +163,7 @@ function cellClicked(cell) {
 function checkWin() {
     if (size - mines == shownCount) {
         for (let i = 0; i < minesArray.length; i++) {
-            if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "mine_green.png");
+            if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "images/mine_green.png");
         }
         game_state = 1;
         winSound.play();                              
