@@ -1,3 +1,4 @@
+//TIMER
 var Stopwatch = function(elem, options) {
 
     var timer = createTimer(),
