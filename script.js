@@ -32,6 +32,9 @@ let flagOffSound = new Audio("sounds/unflag.wav");
 let winSound = new Audio("sounds/gameWin.wav");
 let middleClick = new Audio("sounds/middleClick.wav");
 let middleUnClick = new Audio("sounds/middleClickOff.wav");
+let timer_started = false;
+let timer = new Stopwatch();
+let timer_elem = timer.get();
 
 generateMenu();
 save();
@@ -75,8 +78,10 @@ function drawGrid() {
 
     grid.style.width = grid_width + "px";
     grid.style.height = grid_height + "px";
-    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true)
-    newElement("score", "score", "h2", "MINES: " + score, [], body, true); 
+    newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true);
+    newElement("details", "details", "div", "" + score, [], body, true); 
+    newElement("score", "score", "h2", "MINES: " + score, [], id("details"), true); 
+    id("details").appendChild(timer_elem);
     
     for (let i = 0; i < minesArray.length; i++) {
         let cell = document.createElement("div");      
@@ -136,7 +141,11 @@ function drawGrid() {
 }
 
 function cellClicked(cell) {
-    if (game_state == 0) {        
+    if (game_state == 0) {     
+        if (!timer_started) {
+            timer.start();   
+            timer.started = true;
+        }
         if (btnState[cell].state == 0) {
             id("btn" + cell).style.visibility = "hidden";
             id(cell).style.backgroundColor = "#9eabb8";
@@ -166,7 +175,9 @@ function checkWin() {
             if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "images/mine_green.png");
         }
         game_state = 1;
-        winSound.play();                              
+        winSound.play();    
+        timer.stop(); 
+        id("timer").style.color = "green";                         
     }
 }
 
@@ -197,7 +208,6 @@ function checkSurroundBtn(cell, type) {
     let cells = [];
     let f = 0, m = 0;
     let l = false;
-    console.log(cell);
     for (let i = 0; i < surrounding.length; i++) {    
         let x = surrounding[i][0] + c[0];
         let y = surrounding[i][1] + c[1];  
@@ -322,6 +332,10 @@ function reset(type) {
     score = mines;
     shownCount = 0;
     id("score").innerHTML = "MINES: " + mines;
+    timer_started = false;
+    timer.stop();
+    timer.reset();
+    id("timer").style.color = "white";
 }
 
 document.addEventListener('contextmenu', function(event) {
@@ -459,6 +473,8 @@ function estDiff(t) {
 
 function loose(cells) {
     explosionSound.play();
+    timer.stop();
+    id("timer").style.color = "red";
     game_state = 1;
     for (let i = 0; i < minesArray.length; i++) {
         if (btnState[i].state == "1") {
@@ -475,7 +491,7 @@ function loose(cells) {
     cells.forEach(cell => {
         id("mineimg" + cell).setAttribute("src", "images/mine_red.png");
     });
-    for (let i = 0; btnState.length; i++) {
+    for (let i = 0; i < btnState.length; i++) {
         if (btnState[i].state == 1 && minesArray[i] != "%") {
             id("btn" + i).style.visibility = "visible";
             id("btn" + i).setAttribute("src", "images/flag_wrong.png");
@@ -486,7 +502,8 @@ function loose(cells) {
 /*
 - Timer
 - View-port
+- loose error
 - End Game Overlay
-- 100% Mines Breaks it???
-- Show Incorrect Flags
+- Pause/Play
 */
+

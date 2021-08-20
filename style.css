@@ -74,11 +74,6 @@ h1 {
     color:white;
 }
 
-.score {
-    color:white;
-    margin-bottom: 10px;
-}
-
 footer {
     color:white;
     bottom:0;
@@ -124,6 +119,18 @@ footer {
 
 .slider:hover {
     opacity: 1;
+}
+
+.details {
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.timer, .score {
+    color:white;
+    font-size:20px;
 }
 
 .slider::-webkit-slider-thumb {
