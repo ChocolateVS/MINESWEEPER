@@ -167,3 +167,17 @@ footer {
 #btn_div {
     visibility: visible;
 }
+
+.grid_menu {
+    position:absolute;
+    background-color:#2d4c51;
+    z-index:1001;
+    display: flex;
+    visibility:hidden;
+    justify-content:center;
+    align-items:center;
+    font-family:monospace;
+    flex-wrap:wrap;
+    flex-direction:column;
+    align-content: space-evenly;
+}

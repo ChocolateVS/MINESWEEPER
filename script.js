@@ -23,6 +23,8 @@ var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turq
 let screen_width = window.screen.width;
 let screen_height = window.screen.height;
 let darkened = [];
+let paused = true;
+
 //SOUNDS
 let explosionSound = new Audio("sounds/explosion.mp3"); // buffers automatically when created
 let clickSound = new Audio("sounds/click.wav");
@@ -63,6 +65,7 @@ function drawGrid() {
     screen_width = window.screen.width;
     screen_height = window.screen.height;
     let grid = newElement("grid", "grid", "div", "", [], null, false); 
+    newElement("grid_menu", "grid_menu", "div", "", [], grid, true); 
     let cell_width;
 
     if (screen_width / width >= screen_height / height) {
@@ -133,18 +136,39 @@ function drawGrid() {
         
     var bottomMenu = newElement("bottomMenu", "bottomMenu", "div", "", [], null, false);
 
-    newElement("menuBtn", "resetBtn", "button", "MENU (ESC / M)", [["onclick", "menu(0)"]], bottomMenu, true);
     newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], bottomMenu, true);
     newElement("restartBtn", "resetBtn", "button", "PLAY AGAIN (R)", [["onclick", "reset(1)"]], bottomMenu, true);
+    newElement("menuBtn", "resetBtn", "button", "MENU (ESC / M)", [["onclick", "menu(0)"]], bottomMenu, true);
+    newElement("pauseBtn", "resetBtn", "button", "PLAY", [["onclick", "pause()"]], bottomMenu, true);
+    newElement("pasued_msg", "msg", "h1", "Game Paused", [], id("grid_menu"), true);
     
     body.appendChild(bottomMenu);
 }
 
+function pause() {
+    id("grid_menu").style.width = id("grid").style.width;
+    id("grid_menu").style.height = id("grid").style.height;
+
+    if (paused && game_state == 1) {
+        paused = false;
+        id("grid_menu").style.visibility = "hidden";
+        timer.start();
+        id("pauseBtn").textContent = "PAUSE";
+    }
+    else if (!paused && game_state == 1) {
+        paused = true;
+        id("grid_menu").style.visibility = "visible";
+        id("pauseBtn").textContent = "PLAY";
+        timer.stop();
+    }
+
+}
 function cellClicked(cell) {
-    if (game_state == 0) {     
-        if (!timer_started) {
-            timer.start();   
-            timer.started = true;
+    if (game_state != 2) { 
+        if (game_state == 0) {
+            game_state = 1;   
+            id("pauseBtn").style.visibility = "visible"; 
+            pause();
         }
         if (btnState[cell].state == 0) {
             id("btn" + cell).style.visibility = "hidden";
@@ -174,7 +198,8 @@ function checkWin() {
         for (let i = 0; i < minesArray.length; i++) {
             if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "images/mine_green.png");
         }
-        game_state = 1;
+        id("pauseBtn").style.visibility = "hidden";
+        game_state = 2;
         winSound.play();    
         timer.stop(); 
         id("timer").style.color = "green";                         
@@ -336,6 +361,9 @@ function reset(type) {
     timer.stop();
     timer.reset();
     id("timer").style.color = "white";
+    id("pauseBtn").style.visibility = "hidden";
+    id("pauseBtn").textContent = "PAUSE";
+    paused = true;
 }
 
 document.addEventListener('contextmenu', function(event) {
@@ -347,7 +375,7 @@ document.addEventListener('contextmenu', function(event) {
 });
 
 document.addEventListener('mousedown', function(event) {
-    if (game_state == 0 && event.button == 1) { 
+    if (game_state != 2 && event.button == 1) { 
         event.preventDefault();
         middleClick.play();
         let class_name = event.target.className;
@@ -378,7 +406,7 @@ document.addEventListener('mousedown', function(event) {
 });
 
 document.addEventListener('mouseup', function(event) {
-    if (game_state == 0 && event.button == 1) {
+    if (game_state != 2 && event.button == 1) {
         middleUnClick.play();
         unMiddleClick();
     } 
@@ -475,7 +503,8 @@ function loose(cells) {
     explosionSound.play();
     timer.stop();
     id("timer").style.color = "red";
-    game_state = 1;
+    id("pauseBtn").style.visibility = "hidden";
+    game_state = 2;
     for (let i = 0; i < minesArray.length; i++) {
         if (btnState[i].state == "1") {
             if (minesArray[i] == "%") {
@@ -500,7 +529,6 @@ function loose(cells) {
 }
 
 /*
-- Timer
 - View-port
 - loose error
 - End Game Overlay
