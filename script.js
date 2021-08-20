@@ -12,7 +12,6 @@ var blankShown = [];
 var btnState = [];
 let score = mines;
 let body = id("gameBody");
-let allShown = [];
 let shownCount = 0;
 let timerStarted = false;
 let temp_width;
@@ -117,10 +116,12 @@ function drawGrid() {
         button_width = border_width - (boxshadow * 2);
         button.style.width = button_width + "px";
         button.style.height = button_width + "px";
+        button.style.visibility = "visible";
         button_div.style.width = border_width + "px";
         button_div.style.height = border_width + "px";
         button_div.style.marginLeft = - border_width + "px";
         button_div.style.boxShadow = "inset 0px 0px 0px " + boxshadow + "px #bfbfbf";
+        button_div.style.visibility = "visible";
         //button_div.setAttribute("onauxclick", "middleClick(" + i + ")");
         button_div.appendChild(button);
         grid.appendChild(button_div)
@@ -163,15 +164,18 @@ function cellClicked(cell) {
                 recursiveShowNearby(cell);
             }
             else clickSound.play(); 
-            if (size - mines == shownCount) {
-                for (let i = 0; i < minesArray.length; i++) {
-                    if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "mine_green.png");
-                }
-                game_state = 1;
-                winSound.play();
-                //alert("YOU WIN!!!!!!!!!!!");                              
-            }
+            checkWin();          
         }
+    }
+}
+
+function checkWin() {
+    if (size - mines == shownCount) {
+        for (let i = 0; i < minesArray.length; i++) {
+            if (minesArray[i] ==  "%" || minesArray[i] == "") id("btn" + i).setAttribute("src", "mine_green.png");
+        }
+        game_state = 1;
+        winSound.play();                              
     }
 }
 
@@ -202,7 +206,7 @@ function checkSurroundBtn(cell, type) {
     let cells = [];
     let f = 0, m = 0;
     let l = false;
-
+    console.log(cell);
     for (let i = 0; i < surrounding.length; i++) {    
         let x = surrounding[i][0] + c[0];
         let y = surrounding[i][1] + c[1];  
@@ -214,15 +218,17 @@ function checkSurroundBtn(cell, type) {
             }          
         }
         else if (type == 1) {  
-            console.log(cell, btnState[checkCell]);
             if (btnState[checkCell].state == 1) f++;
             if (minesArray[checkCell] == "%") m++;
         }
         else if (type == 2) {      
             if (minesArray[checkCell] != "%") {
-                id("btn" + checkCell).style.visibility = "hidden";  
-                id(checkCell).style.backgroundColor = "#9eabb8";             
-                allShown.push(checkCell);
+                if (id("btn" + checkCell).style.visibility == "visible") {
+                    shownCount++; 
+                    id("btn" + checkCell).style.visibility = "hidden";  
+                }
+                //id("btn_div" + checkCell).style.visibility = "hidden";  
+                id(checkCell).style.backgroundColor = "#9eabb8";                      
                 if (minesArray[checkCell] == "") {
                     clearSound.play();
                     recursiveShowNearby(checkCell);
@@ -234,7 +240,6 @@ function checkSurroundBtn(cell, type) {
             }
         }
     }
-    console.log("Flags: ", f, ", Mines: ", m);
     if (l) loose(cells);
     if (f == m && minesArray[cell] == f) return true;
 }
@@ -353,18 +358,21 @@ document.addEventListener('mousedown', function(event) {
             cell = btn_id.slice(3);
             div_id = "btn_div" + cell;
         }
-     
+        else cell = event.target.id;
         if (class_name == "button_div" && id(btn_id).style.visibility == "hidden" && checkSurroundBtn(cell, 1)) {
-            if (minesArray[cell] != "%" && minesArray[cell] != "" ) {
+            id(div_id).style.visibility = "hidden";
+            id(btn_id).style.visibility = "hidden";  
+            if (minesArray[cell] != "%" && minesArray[cell] != "") {
                 checkSurroundBtn(cell, 2);
             }
         }
         else checkSurroundBtn(cell, 0);
+        checkWin();
     }
 });
 
 document.addEventListener('mouseup', function(event) {
-    if (event.button == 1) {
+    if (game_state == 0 && event.button == 1) {
         middleUnClick.play();
         unMiddleClick();
     } 
@@ -457,19 +465,10 @@ function estDiff(t) {
 
 }
 
-/*
-- Middle Click
-- Timer
-- View-port
-- End Game Overlay
-- 100% Mines Breaks it???
-- Show Incorrect Flags
-*/
-
 function loose(cells) {
     //alert("UR BADDDDDDDDD HAHAHAHA :)");
     explosionSound.play();
-    game_state == 1;
+    game_state = 1;
     for (let i = 0; i < minesArray.length; i++) {
         if (btnState[i].state == "1") {
             if (minesArray[i] == "%") {
@@ -486,3 +485,12 @@ function loose(cells) {
         id("mineimg" + cell).setAttribute("src", "mine_red.png");
     });
 }
+
+/*
+- Middle Click
+- Timer
+- View-port
+- End Game Overlay
+- 100% Mines Breaks it???
+- Show Incorrect Flags
+*/
