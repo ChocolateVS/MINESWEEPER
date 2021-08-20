@@ -20,9 +20,8 @@ let minePer = Math.round(id("minesSlider").value / ((id("widthSlider").value * i
 let mineDiff = "EEEKKKK";
 let diff = ["ONE CLICK...", "EEEEEZZZZ", "OK", "OK OK", "EEEEKKK", "BIG EEEEEK", "GENIUS", "r/MILDY INFURIATING", "IMPOSSIBLE", "GIVE. UP."];
 var colors = ["blue", "green", "red", "purple", "black", "gray", "maroon", "turquoise"];
-let images = ["blank.png", "flag_red.png", "question.png"];
 let screen_width = window.screen.width;
-let screen_height =window.screen.height;
+let screen_height = window.screen.height;
 let darkened = [];
 //SOUNDS
 let explosionSound = new Audio("sounds/explosion.mp3"); // buffers automatically when created
@@ -58,34 +57,27 @@ function newElement(id, classname, type, text, att, appendTo, append) {
 function drawGrid() {
 
     body.innerHTML = "";
-
     screen_width = window.screen.width;
     screen_height = window.screen.height;
-
     let grid = newElement("grid", "grid", "div", "", [], null, false); 
-
     let cell_width;
 
     if (screen_width / width >= screen_height / height) {
         grid_height = Math.round(screen_height * 0.7);
-
         cell_width = (grid_height / (height));
-
         grid_width = cell_width * width;
     }
     else {
         grid_width = Math.round(screen_width * 0.7);
-
         cell_width = (grid_width / (width));
-
         grid_height = cell_width * height;
     }
+
     grid.style.width = grid_width + "px";
     grid.style.height = grid_height + "px";
     newElement("title", "title", "h1", "VERY AMAZING MINE SWEEPER ;)", [], body, true)
     newElement("score", "score", "h2", "MINES: " + score, [], body, true); 
     
-
     for (let i = 0; i < minesArray.length; i++) {
         let cell = document.createElement("div");      
         cell.className = "cell";
@@ -100,7 +92,7 @@ function drawGrid() {
         var type = checkSurround(i);
         
         if (type != 0) {
-            if (type == "%") newElement("mineimg" + i, "mine", "img", "", [["src", "mine.png"]], cell, true);
+            if (type == "%") newElement("mineimg" + i, "mine", "img", "", [["src", "images/mine.png"]], cell, true);
             else cell.innerHTML = type;
             minesArray[i] = type;
         }
@@ -110,7 +102,7 @@ function drawGrid() {
         grid.appendChild(cell);
 
         let button_div = newElement("btn_div" + i, "button_div", "div", "", [], null, false);
-        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", images[0]], ["name", i], ["onclick", "cellClicked(" + i + ")"]], button_div, false);
+        let button = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", "images/bg.png"], ["name", i], ["onclick", "cellClicked(" + i + ")"]], button_div, false);
         
         border_width = cell_width;
         button_width = border_width - (boxshadow * 2);
@@ -122,7 +114,7 @@ function drawGrid() {
         button_div.style.marginLeft = - border_width + "px";
         button_div.style.boxShadow = "inset 0px 0px 0px " + boxshadow + "px #bfbfbf";
         button_div.style.visibility = "visible";
-        //button_div.setAttribute("onauxclick", "middleClick(" + i + ")");
+
         button_div.appendChild(button);
         grid.appendChild(button_div)
         let btn = {
@@ -130,7 +122,6 @@ function drawGrid() {
             state: 0
         }
         btnState.push(btn);
-        
     }
 
     body.appendChild(grid);
@@ -213,7 +204,7 @@ function checkSurroundBtn(cell, type) {
         let checkCell = getCell(x, y);
         if (type == 0) {
             if (btnState[checkCell].state == 0) {
-                id("btn" + checkCell).setAttribute("src", "blank_dark.png");
+                id("btn" + checkCell).style.backgroundColor = "rgb(89, 89, 89)";
                 darkened.push(checkCell);
             }          
         }
@@ -246,7 +237,7 @@ function checkSurroundBtn(cell, type) {
 
 function unMiddleClick() {
     darkened.forEach(e => {
-        id("btn" + e).setAttribute("src", "blank.png");
+        id("btn" + e).style.backgroundColor = "rgb(127, 127, 127)";
     });
     darkened = [];
 }
@@ -299,19 +290,19 @@ function cellRightClicked(btn) {
     if(btnState[btn.name].state == 0) {
         score--;
         flagOnSound.play();
+        id(btn.id).setAttribute("src", "images/flag_red.png");
     }
     else if (btnState[btn.name].state == 1) {
         score++; 
         flagOffSound.play();
+        id(btn.id).setAttribute("src", "images/question.png");
     }
+    else id(btn.id).setAttribute("src", "images/bg.png");
+
     id("score").innerHTML = "MINES: " + score;
+
     btnState[btn.name].state ++;
     if (btnState[btn.name].state == 3) btnState[btn.name].state = 0;
-    
-    let state = btnState[btn.name].state;
-
-    id(btn.id).setAttribute("src", images[state]);
-
 }
 
 function reset(type) {
@@ -466,28 +457,32 @@ function estDiff(t) {
 }
 
 function loose(cells) {
-    //alert("UR BADDDDDDDDD HAHAHAHA :)");
     explosionSound.play();
     game_state = 1;
     for (let i = 0; i < minesArray.length; i++) {
         if (btnState[i].state == "1") {
             if (minesArray[i] == "%") {
-                id("mineimg" + i).setAttribute("src", "flag_green2.png");                           
+                id("mineimg" + i).setAttribute("src", "images/flag_green.png");                           
             }
             else if (minesArray[i] != "%") {
-                id("btn" + i).setAttribute("src", "flag_red2.png");                          
+                id("btn" + i).setAttribute("src", "images/bg.png");                          
             }
             id(i).style.backgroundColor = "#9eabb8";
         }
         id("btn" + i).style.visibility = "hidden";
     }
     cells.forEach(cell => {
-        id("mineimg" + cell).setAttribute("src", "mine_red.png");
+        id("mineimg" + cell).setAttribute("src", "images/mine_red.png");
     });
+    for (let i = 0; btnState.length; i++) {
+        if (btnState[i].state == 1 && minesArray[i] != "%") {
+            id("btn" + i).style.visibility = "visible";
+            id("btn" + i).setAttribute("src", "images/flag_wrong.png");
+        }
+    }
 }
 
 /*
-- Middle Click
 - Timer
 - View-port
 - End Game Overlay
