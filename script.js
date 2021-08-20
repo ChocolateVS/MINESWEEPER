@@ -528,10 +528,4 @@ function loose(cells) {
     }
 }
 
-/*
-- View-port
-- loose error
-- End Game Overlay
-- Pause/Play
-*/
 
