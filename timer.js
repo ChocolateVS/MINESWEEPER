@@ -16,6 +16,14 @@ var Stopwatch = function(elem, options) {
         return document.createElement("span");
     }
 
+    function setTime(time) {
+      clock = time;
+    }
+
+    function getTime(time) {
+      return clock;
+    }
+
     // default options
     options = options || {};
     options.delay = options.delay || 0;
@@ -27,8 +35,10 @@ var Stopwatch = function(elem, options) {
     // public API
     this.start  = start;
     this.stop   = stop;
-    this.reset  = reset;
+    this.reset  = reset;  
     this.get = get;
+    this.setTime = setTime;
+    this.getTime = getTime;
     
     function get() {
         return timer;

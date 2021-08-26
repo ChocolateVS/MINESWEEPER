@@ -8,9 +8,28 @@
 </head>
 
 <body id="mainBody">
-    <div id="gameBody">
+    <div>
+        <h1 id="title" class="title">VERY AMAZING MINE SWEEPER ;)</h1>
+        <div id="details" class="details">
+            <h2 id="score" class="score"></h2>
+        </div>
+        <div id="gameBody" class="gameBody">
+            <div id="grid_menu" class="grid_menu"> 
+                <h1>Game Paused</h1>
+            </div>
+            <div id="grid" class="grid">
 
-    </div>   
+            </div>
+        </div>
+        <div id="bottom_menu" class="bottom_menu">
+            <button id="resetBtn" class="defaultBtn" onclick="get_new_game()">NEW GAME (N)</button>
+            <button id="restartBtn" class="defaultBtn" onclick="set_play_again()">PLAY AGAIN (R)</button>
+            <button id="menuBtn" class="defaultBtn" onclick="menu(0)">MENU (M / ESC)</button>
+            <button id="hostBtn" class="defaultBtn" onclick="host_menu(0)">HOST GAME</button>
+            <button id="joinBtn" class="defaultBtn" onclick="join_menu(0)">JOIN GAME</button>
+            <button id="pauseBtn" class="defaultBtn" onclick="pause()">PLAY (P)</button>
+        </div> 
+    </div>
     <div id="menu" class="menu">
         <div id="mines_div" class="menu-item">
             <h2>MINES: </h2>
@@ -36,11 +55,30 @@
             <h2 id="difficulty">EEEEKKK</h2>
         </div>
     </div>
-    <footer>BETA 3.8 | Rowan Thorley</footer>
+    <!--<div id="host_menu" class="menu">
+        <h1>HOST MULTIPLAYER</h1>
+        <div id="host_buttons_div" class="menu-item">
+            <input type="button" value="CURRENT GAME" class="resetBtn" id="hostCurrentBtn" onclick="host(0)">
+            <input type="button" value="NEW GAME" class="resetBtn" id="hostNewBtn" onclick="host(1)">
+            <input type="button" value="1 V 1" class="resetBtn" id="hostDuelBtn" onclick="host(2)">
+        </div>
+        <input type="button" value="CLOSE" class="resetBtn" id="closeBtn" onclick="host_menu(1)">
+    </div> -->
+    <div id="join_menu" class="menu">
+        <h1>JOIN MULTIPLAYER</h1>
+        <div id="join_buttons_div" class="menu-item">
+            <input type="text" placeholder="#AAAAA" value="" class="resetBtn" id="joinCodeInput">
+            <input type="button" value="JOIN" class="resetBtn" id="joinBtn" onclick="join(0)">
+        </div>
+        <p id="join_error" class="join_error"></p>
+        <input type="button" value="CLOSE" class="resetBtn" id="closeBtn" onclick="join_menu(1)">
+    </div>
+    <footer><p id="client_id" class="footer">Client ID: Unavailable</p>|<p id="game_id" class="footer"> Game ID: Unavailable</p>|<p id="game_version" class="footer">RELEASE 4.0 </p>|<p class="footer">Rowan Thorley</p></footer>
 
 </body>
 <script src="timer.js"></script>
 <script src="init.js"></script>
-<script src="script.js"></script>
+<script src="ws.js"></script>
+<script src="game.js"></script>
 <script src="menu.js"></script>
 </html>

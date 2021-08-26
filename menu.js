@@ -1,6 +1,6 @@
 /***************************Main Menu***************************/
 generateMenu();
-save();
+connect();
 
 function generateMenu() {
     //Buttons
@@ -11,14 +11,26 @@ function generateMenu() {
     newElement("closeBtn", "resetBtn", "button", "CLOSE MENU", [["onclick", "menu(1)"]], id("buttons_div"), true);
 }
 
+function newElement(id, classname, type, text, att, appendTo, append) {
+    let element = document.createElement(type);
+    if (att.length > 0) att.forEach((e) => { element.setAttribute(e[0], e[1]) } );
+    if (type == "h1" || type == "h2") element.innerHTML = text;
+    if (classname == "resetBtn") element.textContent = text;
+    element.id = id;
+    element.className = classname;
+    if (append) appendTo.appendChild(element); 
+    else return element;
+}
+
 function save() {
     width = id("widthSlider").value;
     height = id("heightSlider").value;
+    size = width * height;
     temp_height = height;
     temp_width = width;
     mines = id("minesSlider").value;
     estDiff(1);
-    reset(0);
+    get_new_game();
 }
 
 function estDiff(t) {
@@ -60,7 +72,6 @@ function menu(i) {
     id("difficulty").textContent = "DIFFICULTY: " + mineDiff;
 }
 
-
 id("minesSlider").addEventListener("input", function() {
     id("mineCount").textContent = id("minesSlider").value;
     estDiff();
@@ -81,3 +92,13 @@ id("heightSlider").addEventListener("input", function() {
     id("mineCount").textContent = id("minesSlider").value;
     estDiff();
 }, false);
+
+function host_menu(i) {
+    if (i == 0) visible("host_menu");
+    else if (i == 1) hidden("host_menu");
+}
+
+function join_menu(i) {
+    if (i == 0) visible("join_menu");
+    else if (i == 1) hidden("join_menu");
+}

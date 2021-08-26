@@ -8,17 +8,6 @@ function shuffleArray(array) {
     }
 };
 
-function newElement(id, classname, type, text, att, appendTo, append) {
-    let element = document.createElement(type);
-    if (att.length > 0) att.forEach((e) => { element.setAttribute(e[0], e[1]) } );
-    if (type == "h1" || type == "h2") element.innerHTML = text;
-    if (classname == "resetBtn") element.textContent = text;
-    element.id = id;
-    element.className = classname;
-    if (append) appendTo.appendChild(element); 
-    else return element;
-}
-
 function drawGrid() {
 
     //Create Grid Element
@@ -87,7 +76,7 @@ function drawGrid() {
 
         /*********************Create Button*********************/
         let btn_div = newElement("btn_div" + i, "button_div", "div", "", [], null, false);
-        let btn = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", "images/bg.png"], ["name", i], ["onclick", "cellClicked(" + i + ")"]], btn_div, false);
+        let btn = newElement("btn" + i, "button", "input", "", [["type", "image"], ["src", "images/bg.png"], ["name", i]], btn_div, false);
         
         //Button Width 
         let btn_width = cell_width - (boxshadow * 2);
@@ -127,6 +116,8 @@ function drawGrid() {
     newElement("resetBtn", "resetBtn", "button", "NEW GAME (N)", [["onclick", "reset(0)"]], bottomMenu, true);
     newElement("restartBtn", "resetBtn", "button", "PLAY AGAIN (R)", [["onclick", "reset(1)"]], bottomMenu, true);
     newElement("menuBtn", "resetBtn", "button", "MENU (ESC / M)", [["onclick", "menu(0)"]], bottomMenu, true);
+    newElement("hostBtn", "resetBtn", "button", "HOST", [["onclick", "host_menu(0)"]], bottomMenu, true);
+    newElement("hostBtn", "resetBtn", "button", "JOIN", [["onclick", "join_menu(0)"]], bottomMenu, true);
     newElement("pauseBtn", "resetBtn", "button", "PLAY", [["onclick", "pause()"]], bottomMenu, true);
     newElement("pasued_msg", "msg", "h1", "Game Paused", [], id("grid_menu"), true);
     
@@ -228,6 +219,7 @@ function reset(type) {
 
 /***************************LEFT CLICK***************************/
 function cellClicked(cell) {
+    
     //If Game has not finished
     if (game_state != 2) { 
         //If game has not started > Begin Timer
@@ -268,10 +260,9 @@ function cellClicked(cell) {
 
 /***************************RIGHT CLICK***************************/
 document.addEventListener('contextmenu', function(event) {
-    let button = event.target;
-    event.preventDefault();
-    if (button.className == "button") {
-        cellRightClicked(button);
+    let classname = event.target.className;
+    if (classname == "button_div" || classname == "button" || classname == "cell") {
+        event.preventDefault();
     }
 });
 
@@ -299,35 +290,51 @@ function cellRightClicked(btn) {
     if (btnState[btn.name].state == 3) btnState[btn.name].state = 0;
 }
 
-/***************************MIDDLE CLICK***************************/
+/***************************CLICK!***************************/
 document.addEventListener('mousedown', function(event) {
-    if (game_state != 2 && event.button == 1) { 
+    let classname = event.target.className;
+    //If Clicking a cell
+    if (classname == "button_div" || classname == "button" || classname == "cell" && game_state != 2) {
+
         event.preventDefault();
-        middleClick.play();
-        let class_name = event.target.className;
-        let cell;
-        let div_id;
-        let btn_id;
-        if (class_name == "button_div") {
+
+        //Get Cell Number  
+        let cell, btn_id, div_id;
+
+        if (classname == "button_div") {
             div_id = event.target.id;
             cell = div_id.slice(7);
             btn_id = "btn" + cell;
         }
-        else if (class_name == "button") {
+        else if (classname == "button") {
             btn_id = event.target.id;
             cell = btn_id.slice(3);
             div_id = "btn_div" + cell;
         }
         else cell = event.target.id;
-        if (class_name == "button_div" && id(btn_id).style.visibility == "hidden" && checkSurroundBtn(cell, 1)) {
-            id(div_id).style.visibility = "hidden";
-            id(btn_id).style.visibility = "hidden";  
-            if (minesArray[cell] != "%" && minesArray[cell] != "") {
-                checkSurroundBtn(cell, 2);
+
+
+        //LEFT CLICK
+        if (event.button == 0 && classname == "button") cellClicked(event.target.id.slice(3));
+
+        //RIGHT CLICK
+        if (event.button == 2 && classname == "button") cellRightClicked(event.target);
+
+        //Middle Click
+        if (event.button == 1) { 
+            middleClick.play();           
+            
+            if (classname == "button_div" && id(btn_id).style.visibility == "hidden" && checkSurroundBtn(cell, 1)) {
+                hidden(div_id);
+                hidden(btn_id);
+                if (minesArray[cell] != "%" && minesArray[cell] != "") {
+                    checkSurroundBtn(cell, 2);
+                }
             }
+            else checkSurroundBtn(cell, 0);
+            checkWin();
         }
-        else checkSurroundBtn(cell, 0);
-        checkWin();
+        
     }
 });
 
