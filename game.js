@@ -89,7 +89,7 @@ var Stopwatch = function(elem, options) {
     }
   
   };
-  
+
 let client_id;
 let game_id;
 
@@ -453,7 +453,7 @@ function game_won() {
 
     //For each mine, make green!
     for (let i = 0; i < minesArray.length; i++) {
-        if (minesArray[i] ==  "%") id("btn" + i).setAttribute("src", "images/mine_green.png");
+        if (minesArray[i] ==  "%") setImage("btn" + i, "green_mine");
         else hidden("btn" + i);
     }          
 }
