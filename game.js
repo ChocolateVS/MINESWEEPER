@@ -479,7 +479,7 @@ function unHide(cells) {
 //LOCAL SERVER
 //const serverAddress = 'ws://localhost:8080/';
 //ONLINE SERVER
-const serverAddress = 'wss://rowansserver.com:8080/';
+const serverAddress = 'ws://rowansserver.com:8080/';
 
 let ws;
 
