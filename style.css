@@ -64,7 +64,7 @@ h1 {
     font-size:30px;
 }
 
-.resetBtn {
+.defaultBtn, .resetBtn {
     margin: 10px 5px 0px 5px;
     width:150px;
     height:40px;
@@ -78,9 +78,14 @@ footer {
     color:white;
     bottom:0;
     position:absolute;
-    padding:10px;
+    display: inline-block;
 }
 
+.footer {
+    display: inline-block;
+    padding:5px;
+    margin:0;
+}
 .menu {
     opacity:1;
     filter: alpha(opacity=20);
@@ -168,6 +173,12 @@ footer {
     visibility: visible;
 }
 
+.gameBody {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
 .grid_menu {
     position:absolute;
     background-color:#2d4c51;
@@ -180,4 +191,9 @@ footer {
     flex-wrap:wrap;
     flex-direction:column;
     align-content: space-evenly;
+}
+
+.join_error {
+    color:red;
+    font-family: monospace;
 }
